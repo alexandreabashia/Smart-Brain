@@ -10,7 +10,7 @@ import Particles from 'react-particles-js';
 const custom = {
   "particles": {
     "number": {
-      "value": 150
+      "value": 100
     },
     "size": {
       "value": 7
@@ -27,6 +27,17 @@ const custom = {
 }
 
 class App extends Component {
+  constructor () {
+    super();
+    this.state = {
+      input: ''
+    }
+  }
+
+  onInputChange = (event) => {
+    console.log(event.target.value);
+  }
+
   render() {
     return (
       <div className="App">
@@ -34,7 +45,7 @@ class App extends Component {
         <Navigation />
         <Logo />
         <Rank />
-        <ImageLinkForm />
+        <ImageLinkForm onInputChange={this.onInputChange} />
         {/* <FaceRecognition /> */}
       </div>
     );

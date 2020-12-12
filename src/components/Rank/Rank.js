@@ -4,7 +4,7 @@ import '../../App.css';
 const Rank = () => {
     return (
         <div>
-            <div>
+            <div className='b'>
                 {'Alexandre, your current rank is...'}
             </div>
             <div className='white f1'>
