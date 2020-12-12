@@ -1,8 +1,9 @@
-import './imagelinkform.css'
+import './imagelinkform.css';
+import '../../App.css';
 
 const ImageLinkForm = () => {
     return (
-        <div>
+        <div className='zIndex'>
             <p className='f3'>
             {'This Magic Brain will detect faces in your pictures, give it a try'}
             </p>

@@ -1,4 +1,5 @@
-import './rank.css'
+import './rank.css';
+import '../../App.css';
 
 const Rank = () => {
     return (
