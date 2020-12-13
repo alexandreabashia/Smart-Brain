@@ -2,12 +2,18 @@
 
 import React, { Component } from 'react';
 import './App.css';
+
 import Navigation from './components/Navigation/Navigation';
 import Logo from './components/Logo/Logo';
 import ImageLinkForm from './components/Imagelinkform/ImageLinkForm';
 import Rank from './components/Rank/Rank';
 
 import Particles from 'react-particles-js';
+import Clarifai from 'clarifai';
+
+const app = new Clarifai.App({
+ apiKey: 'e576cc39a0c8426fae682a3e7c095ccc'
+});
 
 const particlesCustom = {
   "particles": {
@@ -41,7 +47,16 @@ class App extends Component {
   }
 
   onBtnSubmit = () => {
-    console.log('click');
+    app.inputs.create({
+      url: "https://samples.clarifai.com/metro-north.jpg"
+    }).then(
+      function(response) {
+        console.log(response);
+      },
+      function(err) {
+        // there was an error
+      }
+    );
   }
 
   render() {
