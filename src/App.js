@@ -53,10 +53,19 @@ class App extends Component {
     this.setState({imageUrl: this.state.input});
     console.log(this.state.input);
 
+    //Face_Detect
     app.models.predict(Clarifai.FACE_DETECT_MODEL, this.state.input)
     .then(response => {
       console.log(response.outputs[0].data.regions[0].region_info.bounding_box);
-      
+    })
+    .catch(error => {
+      console.log(error);
+    });
+
+    //General_Model
+    app.models.predict(Clarifai.GENERAL_MODEL, this.state.input)
+    .then(response => {
+      console.log(response.outputs[0].data.concepts);
     })
     .catch(error => {
       console.log(error);
