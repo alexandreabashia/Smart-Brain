@@ -13,7 +13,7 @@ import Particles from 'react-particles-js';
 import Clarifai from 'clarifai';
 
 const app = new Clarifai.App({
- apiKey: 'e576cc39a0c8426fae682a3e7c095ccc'
+  apiKey: 'e576cc39a0c8426fae682a3e7c095ccc'
 });
 
 const particlesCustom = {
@@ -36,40 +36,65 @@ const particlesCustom = {
 }
 
 class App extends Component {
-  constructor () {
+  constructor() {
     super();
     this.state = {
       input: '',
-      imageUrl: ''
+      imageUrl: '',
+      box: {}
     }
   }
 
+  // 1
   onInputChange = (event) => {
-    this.setState({input: event.target.value});
+    this.setState({ input: event.target.value });
   }
 
+  // 2 
+  calculateFaceLocation = (data) => {
+    //get info about region
+    const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
+    const image = document.getElementById('inputImage');
+    const width = image.width;
+    const height = image.height;
+    // console.log(width, height);
+    return {
+      leftCol: clarifaiFace.left_col * width,
+      topRow: clarifaiFace.top_row * height,
+      rightCol: width - (clarifaiFace.right_col * width),
+      bottomRow: height - (clarifaiFace.bottom_row * height)
+    }
+  }
+
+  // 3
+  displayFaceBox = (box) => {
+    console.log(box)
+    this.setState({ box: box })
+  }
+
+
+  // 4
   onBtnSubmit = () => {
-    // image example  https://buffer.com/library/content/images/size/w300/2020/05/Frame-9.png 
-    this.setState({imageUrl: this.state.input});
-    console.log(this.state.input);
+    this.setState({ imageUrl: this.state.input });
 
-    //Face_Detect
+    // -1
     app.models.predict(Clarifai.FACE_DETECT_MODEL, this.state.input)
-    .then(response => {
-      console.log(response.outputs[0].data.regions[0].region_info.bounding_box);
-    })
-    .catch(error => {
-      console.log(error);
-    });
+      .then(response => {
+        this.displayFaceBox(this.calculateFaceLocation(response));
+        // console.log(response.outputs[0].data.regions[0].region_info.bounding_box);
+      })
+      .catch(error => {
+        console.log(error);
+      });
 
-    //General_Model
-    app.models.predict(Clarifai.GENERAL_MODEL, this.state.input)
-    .then(response => {
-      console.log(response.outputs[0].data.concepts);
-    })
-    .catch(error => {
-      console.log(error);
-    });
+    // --2
+    // app.models.predict(Clarifai.GENERAL_MODEL, this.state.input)
+    // .then(response => {
+    //   console.log(response.outputs[0].data.concepts);
+    // })
+    // .catch(error => {
+    //   console.log(error);
+    // });
   }
 
   render() {
@@ -80,7 +105,7 @@ class App extends Component {
         <Logo />
         <Rank />
         <ImageLinkForm onInputChange={this.onInputChange} onBtnSubmit={this.onBtnSubmit} />
-        <FaceRecognition imageUrl={this.state.imageUrl} />
+        <FaceRecognition imageUrl={this.state.imageUrl} box={this.state.box}  />
       </div>
     );
   }
