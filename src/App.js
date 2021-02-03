@@ -1,5 +1,3 @@
-// face detection key: e576cc39a0c8426fae682a3e7c095ccc
-
 import React, { Component } from 'react';
 import './App.css';
 
@@ -14,6 +12,7 @@ import Register from './components/Register/Register';
 import Particles from 'react-particles-js';
 import Clarifai from 'clarifai';
 
+//my key: e576cc39a0c8426fae682a3e7c095ccc
 const app = new Clarifai.App({
   apiKey: 'e576cc39a0c8426fae682a3e7c095ccc'
 });
@@ -43,25 +42,49 @@ class App extends Component {
     this.state = {
       input: '',
       imageUrl: '',
+      route: 'signin', //decide what to show: Login, register, or Home page
+      isSignedIn: false,
       box: {},
-      route: 'signin',
-      isSignedIn: false
+      user: {
+        id: '',
+        name: '',
+        email: '',
+        entries: 0,
+        joined: ''
+      }
     }
   }
 
-  // Out 1
-  onInputChange = (event) => {
-    this.setState({ input: event.target.value });
+  loadUser = (data) => {
+    this.setState({
+      user: {
+        id: data.id,
+        name: data.name,
+        email: data.email,
+        entries: data.entries,
+        joined: data.joined
+      }
+    })
   }
 
-  // Out 2 
+  // // Connect to BACKEND test
+  // componentDidMount(){
+  //   fetch('http://localhost:3001/').then(response => response.json()).then(console.log)
+  // }
+
+  onInputChange = (e) => {
+    this.setState({ input: e.target.value });
+    console.log(e.target.value)
+  }
+
   calculateFaceLocation = (data) => {
     //get info about region
     const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
     const image = document.getElementById('inputImage');
     const width = image.width;
     const height = image.height;
-    // console.log(width, height);
+    // console.log(width, height);  
+
     return {
       leftCol: clarifaiFace.left_col * width,
       topRow: clarifaiFace.top_row * height,
@@ -70,51 +93,47 @@ class App extends Component {
     }
   }
 
-  // Out 3
   displayFaceBox = (box) => {
-    console.log(box)
     this.setState({ box: box })
   }
 
-  // Out 4
   onRouteChange = (dynamicRoute) => {
     if (dynamicRoute === 'signout') {
-      this.setState({isSignedIn:false})
+      this.setState({ isSignedIn: false })
     } else if (dynamicRoute === 'home') {
-      this.setState({isSignedIn: true})
+      this.setState({ isSignedIn: true })
     }
 
     this.setState({ route: dynamicRoute });
   }
 
-  // Out 5
   onBtnSubmit = () => {
     this.setState({ imageUrl: this.state.input });
 
-    // IN 1
+    // inside onBtnSubmit
     app.models.predict(Clarifai.FACE_DETECT_MODEL, this.state.input)
       .then(response => {
         this.displayFaceBox(this.calculateFaceLocation(response));
-        // console.log(response.outputs[0].data.regions[0].region_info.bounding_box);
+        console.log(response.outputs[0].data.regions[0].region_info.bounding_box);
       })
       .catch(error => {
         console.log('please enter image link', error);
       });
 
-    // IN 2
-    // app.models.predict(Clarifai.GENERAL_MODEL, this.state.input)
-    // .then(response => {
-    //   console.log(response.outputs[0].data.concepts);
-    // })
-    // .catch(error => {
-    //   console.log(error);
-    // });
+    // inside onBtnSubmit
+    app.models.predict(Clarifai.GENERAL_MODEL, this.state.input)
+      .then(response => {
+        console.log(response.outputs[0].data.concepts);
+      })
+      .catch(error => {
+        console.log(error);
+      });
   }
 
   render() {
     // this.state.route,isSignedIn, imageurl,box. got the idea, hopefully not confusing. not gonna use YET!
     // const {isSignedIn, imageUrl, route, box } = this.state;
-    
+
     return (
       <div className="App">
         <Particles width='99%' height='99%' className='particles' params={particlesCustom} />
@@ -127,10 +146,10 @@ class App extends Component {
             <ImageLinkForm onInputChange={this.onInputChange} onBtnSubmit={this.onBtnSubmit} />
             <FaceRecognition imageUrl={this.state.imageUrl} box={this.state.box} />
           </div>
-          : this.state.route === 'signin' 
-          ? <SignIn onRouteChange = {this.onRouteChange} /> 
-          : <Register onRouteChange = {this.onRouteChange} />
-          
+          : this.state.route === 'signin'
+            ? <SignIn onRouteChange={this.onRouteChange} />
+            : <Register loadUser={this.loadUser} onRouteChange={this.onRouteChange} />
+
         }
       </div>
     );
