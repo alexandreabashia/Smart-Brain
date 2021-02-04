@@ -25,12 +25,13 @@ class SignIn extends Component {
             method: 'post', 
             headers: {'Content-type': 'Application/json'},
             body: JSON.stringify({ email: this.state.signInEmail, password: this.state.signInPassword})
-        }).then(response => response.json()).then(data => { 
-            if (data === 'success') {
+        }).then(response => response.json()).then(user => { 
+            if (user.id) {
+                this.props.loadUser(user);
+                // console.log(user)
                 this.props.onRouteChange('home');
-                console.log('success')
             } else {
-                alert('wrong Email or Password')
+                alert('Invalid Email or Password')
             }
         })
     }
