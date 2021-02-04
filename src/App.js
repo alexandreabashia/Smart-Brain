@@ -74,7 +74,6 @@ class App extends Component {
 
   onInputChange = (e) => {
     this.setState({ input: e.target.value });
-    console.log(e.target.value)
   }
 
   calculateFaceLocation = (data) => {
@@ -111,23 +110,38 @@ class App extends Component {
     this.setState({ imageUrl: this.state.input });
 
     // inside onBtnSubmit
+    // https://upload.wikimedia.org/wikipedia/commons/8/85/Elon_Musk_Royal_Society_%28crop1%29.jpg
     app.models.predict(Clarifai.FACE_DETECT_MODEL, this.state.input)
       .then(response => {
-        this.displayFaceBox(this.calculateFaceLocation(response));
-        console.log(response.outputs[0].data.regions[0].region_info.bounding_box);
+        this.displayFaceBox(this.calculateFaceLocation(response)); 
+        if (response) {
+          fetch('http://localhost:3001/image', {
+            method: 'put', 
+            headers: {'Content-type': 'application/json'},
+            body: JSON.stringify({
+              id: this.state.user.id
+            })
+          })
+          .then(response => response.json())
+          .then(count => {
+            this.setState(Object.assign(this.state.user, {entries: count}))
+            this.setState()
+          })
+        }
+        // console.log(response.outputs[0].data.regions[0].region_info.bounding_box);
       })
       .catch(error => {
         console.log('please enter image link', error);
       });
 
     // inside onBtnSubmit
-    app.models.predict(Clarifai.GENERAL_MODEL, this.state.input)
-      .then(response => {
-        console.log(response.outputs[0].data.concepts);
-      })
-      .catch(error => {
-        console.log(error);
-      });
+    // app.models.predict(Clarifai.GENERAL_MODEL, this.state.input)
+    //   .then(response => {
+    //     console.log(response.outputs[0].data.concepts);
+    //   })
+    //   .catch(error => {
+    //     console.log(error);
+    //   });
   }
 
   render() {
