@@ -30,8 +30,6 @@ class SignIn extends Component {
                 this.props.loadUser(user);
                 // console.log(user)
                 this.props.onRouteChange('home');
-            } else {
-                alert('Invalid Email or Password')
             }
         })
     }
