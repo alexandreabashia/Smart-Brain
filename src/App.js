@@ -36,23 +36,25 @@ const particlesCustom = {
   }
 }
 
+const initialState = {
+  input: '',
+  imageUrl: '',
+  route: 'signin', //decide what to show: Login, register, or Home page
+  isSignedIn: false,
+  box: {},
+  user: {
+    id: '',
+    name: '',
+    email: '',
+    entries: 0,
+    joined: ''
+  }
+}
+
 class App extends Component {
   constructor() {
     super();
-    this.state = {
-      input: '',
-      imageUrl: '',
-      route: 'signin', //decide what to show: Login, register, or Home page
-      isSignedIn: false,
-      box: {},
-      user: {
-        id: '',
-        name: '',
-        email: '',
-        entries: 0,
-        joined: ''
-      }
-    }
+    this.state = initialState;
   }
 
   loadUser = (data) => {
@@ -98,7 +100,7 @@ class App extends Component {
 
   onRouteChange = (dynamicRoute) => {
     if (dynamicRoute === 'signout') {
-      this.setState({ isSignedIn: false })
+      this.setState(initialState)
     } else if (dynamicRoute === 'home') {
       this.setState({ isSignedIn: true })
     }
@@ -113,20 +115,21 @@ class App extends Component {
     // https://upload.wikimedia.org/wikipedia/commons/8/85/Elon_Musk_Royal_Society_%28crop1%29.jpg
     app.models.predict(Clarifai.FACE_DETECT_MODEL, this.state.input)
       .then(response => {
-        this.displayFaceBox(this.calculateFaceLocation(response)); 
+        this.displayFaceBox(this.calculateFaceLocation(response));
         if (response) {
           fetch('http://localhost:3001/image', {
-            method: 'put', 
-            headers: {'Content-type': 'application/json'},
+            method: 'put',
+            headers: { 'Content-type': 'application/json' },
             body: JSON.stringify({
               id: this.state.user.id
             })
           })
-          .then(response => response.json())
-          .then(count => {
-            this.setState(Object.assign(this.state.user, {entries: count}))
-            this.setState()
-          })
+            .then(response => response.json())
+            .then(count => {
+              this.setState(Object.assign(this.state.user, { entries: count }))
+              this.setState()
+            })
+            .catch(console.log)
         }
         // console.log(response.outputs[0].data.regions[0].region_info.bounding_box);
       })
@@ -156,7 +159,7 @@ class App extends Component {
         { this.state.route === 'home' ?
           <div>
             <Logo />
-            <Rank name = {this.state.user.name} entries = {this.state.user.entries} />
+            <Rank name={this.state.user.name} entries={this.state.user.entries} />
             <ImageLinkForm onInputChange={this.onInputChange} onBtnSubmit={this.onBtnSubmit} />
             <FaceRecognition imageUrl={this.state.imageUrl} box={this.state.box} />
           </div>
