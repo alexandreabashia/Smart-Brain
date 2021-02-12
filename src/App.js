@@ -10,12 +10,10 @@ import SignIn from './components/SignIn/SignIn';
 import Register from './components/Register/Register';
 
 import Particles from 'react-particles-js';
-import Clarifai from 'clarifai';
 
+// import Clarifai from 'clarifai'; // i took clarifai to the backend
 //my key: e576cc39a0c8426fae682a3e7c095ccc
-const app = new Clarifai.App({
-  apiKey: 'e576cc39a0c8426fae682a3e7c095ccc'
-});
+
 
 const particlesCustom = {
   "particles": {
@@ -113,7 +111,14 @@ class App extends Component {
 
     // inside onBtnSubmit
     // https://upload.wikimedia.org/wikipedia/commons/8/85/Elon_Musk_Royal_Society_%28crop1%29.jpg
-    app.models.predict(Clarifai.FACE_DETECT_MODEL, this.state.input)
+    fetch('http://localhost:3001/imageurl', {
+      method: 'post',
+      headers: { 'Content-type': 'application/json' },
+      body: JSON.stringify({
+        input: this.state.input
+      })
+    })
+      .then(response => response.json())
       .then(response => {
         this.displayFaceBox(this.calculateFaceLocation(response));
         if (response) {
