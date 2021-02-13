@@ -103,7 +103,7 @@ class App extends Component {
       this.setState({ isSignedIn: true })
     }
 
-    this.setState({ route: dynamicRoute });
+    this.setState({ route: dynamicRoute }); 
   }
 
   onBtnSubmit = () => {
